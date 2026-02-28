@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const fetch = require('node-fetch');
 const cors = require('cors');
@@ -5,40 +7,113 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
-app.use(express.static('public'));
 
-const TOKEN = 'rLu3ssnVmsSNXfNnFLVwUxS5AUwUpAbBrS';
+const PORT = 3000;
+const TAGPLUS_URL = 'https://novoapp.tagplus.com.br/api/produtos';
+const TOKEN = process.env.TAGPLUS_TOKEN;
 
-// Rota para buscar produtos
-app.get('/api/produtos', async (req, res) => {
+// CACHE
+let cacheProdutos = null;
+let cacheTempo = null;
+const CACHE_DURACAO = 1000 * 60 * 5; // 5 minutos
+
+// FUNÇÃO BUSCAR PRODUTOS
+async function buscarProdutosTagPlus() {
 
     try {
 
-        const response = await fetch('https://novoapp.tagplus.com.br/api/v1/produtos', {
+        console.log("Buscando produtos da TagPlus...");
+
+        const response = await fetch(TAGPLUS_URL, {
+
             headers: {
-                'Authorization': 'Bearer ' + TOKEN,
-                'Accept': 'application/json'
-            }
+                Authorization: `Bearer ${TOKEN}`,
+                Accept: 'application/json'
+            },
+            timeout: 10000
         });
 
-        const texto = await response.text();
+        if (!response.ok)
+            throw new Error(`Erro TagPlus: ${response.status}`);
 
-        // evita erro JSON inválido
-        try {
-            const json = JSON.parse(texto);
-            res.json(json);
-        } catch {
-            res.json({ erro: "Resposta não é JSON", resposta: texto });
+        const data = await response.json();
+
+        cacheProdutos = data;
+        cacheTempo = Date.now();
+
+        console.log("Produtos sincronizados com sucesso");
+
+        return data;
+
+    } catch (error) {
+
+        console.error("Erro ao sincronizar:", error.message);
+
+        if (cacheProdutos)
+            return cacheProdutos;
+
+        throw error;
+
+    }
+
+}
+
+// ROTA PRODUTOS
+app.get('/produtos', async (req, res) => {
+
+    try {
+
+        const agora = Date.now();
+
+        // usa cache se válido
+        if (cacheProdutos && (agora - cacheTempo < CACHE_DURACAO)) {
+
+            console.log("Usando cache");
+
+            return res.json(cacheProdutos);
+
         }
 
-    } catch (erro) {
+        const produtos = await buscarProdutosTagPlus();
 
-        res.json({ erro: erro.message });
+        res.json(produtos);
+
+    } catch (error) {
+
+        res.status(500).json({
+
+            erro: "Erro ao buscar produtos",
+            detalhe: error.message
+
+        });
 
     }
 
 });
 
-app.listen(3000, () => {
-    console.log('Catálogo rodando em http://localhost:3000');
+// ROTA STATUS
+app.get('/status', (req, res) => {
+
+    res.json({
+
+        status: "online",
+        cache: cacheProdutos ? "ativo" : "vazio",
+        ultimaAtualizacao: cacheTempo
+
+    });
+
+});
+
+// SINCRONIZAÇÃO AUTOMÁTICA
+setInterval(() => {
+
+    buscarProdutosTagPlus();
+
+}, CACHE_DURACAO);
+
+// INICIAR
+app.listen(PORT, () => {
+
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+
 });

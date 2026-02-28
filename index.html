@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Catálogo atacadista – consulte produtos, preços e condições de atacado pelo celular.">
+    <title>Catálogo Atacadista</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="#tela-catalogo" class="skip-link">Pular para o catálogo</a>
+
+    <div id="app">
+        <!-- Tela 1 – Boas-vindas / Login -->
+        <section id="tela-login" class="tela ativa" aria-labelledby="titulo-login">
+            <header class="header-simples">
+                <h1 id="titulo-login">Bem-vindo ao catálogo atacadista</h1>
+                <p class="subtitulo">Consulte produtos, preços de atacado e faça seus pedidos pelo celular.</p>
+            </header>
+            <main class="conteudo-central">
+                <form id="form-login" class="form-card" novalidate>
+                    <h2>Acesso ao catálogo</h2>
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" placeholder="seu@email.com" autocomplete="email" required>
+
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" placeholder="••••••••" autocomplete="current-password" required>
+
+                    <button type="submit" class="btn btn-primario btn-grande">Entrar</button>
+                </form>
+
+                <p class="separador">ou</p>
+
+                <a href="#" id="btn-whatsapp" class="btn btn-secundario btn-grande" role="button">
+                    Acesso rápido via WhatsApp
+                </a>
+
+                <p class="texto-pequeno">
+                    Sem cadastro? Você pode
+                    <button type="button" class="link-btn" id="entrar-sem-login">acessar o catálogo</button>
+                    e finalizar o pedido pelo WhatsApp.
+                </p>
+            </main>
+        </section>
+
+        <!-- Tela 2 – Catálogo de Produtos -->
+        <section id="tela-catalogo" class="tela" aria-labelledby="titulo-catalogo" hidden>
+            <header class="header-fixo">
+                <h1 id="titulo-catalogo">Catálogo</h1>
+                <div class="header-acoes">
+                    <button type="button" class="btn-icone" id="btn-ver-carrinho" aria-label="Ver carrinho">
+                        🛒
+                        <span class="badge" id="badge-carrinho">0</span>
+                    </button>
+                    <button type="button" class="btn-icone" id="btn-area-cliente" aria-label="Área do cliente">
+                        👤
+                    </button>
+                </div>
+            </header>
+
+            <div class="filtros">
+                <input
+                    type="search"
+                    id="busca"
+                    placeholder="Buscar por nome ou código..."
+                    aria-label="Buscar produtos"
+                >
+                <select id="filtro-ordem" aria-label="Ordenar produtos">
+                    <option value="nome">Nome</option>
+                    <option value="preco">Menor preço</option>
+                    <option value="preco-desc">Maior preço</option>
+                </select>
+            </div>
+
+            <main id="lista-produtos" class="grid-produtos">
+                <p class="loading">Carregando produtos...</p>
+            </main>
+        </section>
+
+        <!-- Tela 3 – Detalhes do Produto -->
+        <section id="tela-produto" class="tela" aria-labelledby="titulo-produto" hidden>
+            <header class="header-fixo">
+                <button type="button" class="btn-voltar" id="voltar-catalogo" aria-label="Voltar ao catálogo">
+                    ← Voltar
+                </button>
+                <h1 id="titulo-produto">Produto</h1>
+            </header>
+            <main id="detalhe-produto" class="detalhe-produto">
+                <!-- Preenchido via JavaScript -->
+            </main>
+        </section>
+
+        <!-- Tela 4 – Carrinho -->
+        <section id="tela-carrinho" class="tela" aria-labelledby="titulo-carrinho" hidden>
+            <header class="header-fixo">
+                <button type="button" class="btn-voltar" id="voltar-carrinho" aria-label="Voltar ao catálogo">
+                    ← Voltar
+                </button>
+                <h1 id="titulo-carrinho">Carrinho</h1>
+            </header>
+            <main id="conteudo-carrinho">
+                <div id="lista-carrinho" class="lista-carrinho"></div>
+                <div id="resumo-carrinho" class="resumo-carrinho"></div>
+                <button type="button" class="btn btn-primario btn-grande" id="btn-ir-finalizar">
+                    Ir para finalização
+                </button>
+            </main>
+        </section>
+
+        <!-- Tela 5 – Finalização de Pedido -->
+        <section id="tela-finalizar" class="tela" aria-labelledby="titulo-finalizar" hidden>
+            <header class="header-fixo">
+                <button type="button" class="btn-voltar" id="voltar-finalizar" aria-label="Voltar ao carrinho">
+                    ← Voltar
+                </button>
+                <h1 id="titulo-finalizar">Finalizar pedido</h1>
+            </header>
+            <main class="form-card">
+                <h2>Contato e endereço</h2>
+
+                <label for="finalizar-nome">Nome completo</label>
+                <input type="text" id="finalizar-nome" placeholder="Seu nome" required>
+
+                <label for="finalizar-telefone">Telefone / WhatsApp</label>
+                <input type="tel" id="finalizar-telefone" placeholder="(00) 00000-0000" required>
+
+                <label for="finalizar-endereco">Endereço de entrega</label>
+                <textarea
+                    id="finalizar-endereco"
+                    rows="3"
+                    placeholder="Rua, número, bairro, cidade, CEP"
+                    required
+                ></textarea>
+
+                <h2>Forma de pagamento</h2>
+                <div class="opcoes-pagamento">
+                    <label><input type="radio" name="pagamento" value="pix" checked> PIX</label>
+                    <label><input type="radio" name="pagamento" value="boleto"> Boleto</label>
+                    <label><input type="radio" name="pagamento" value="cartao"> Cartão</label>
+                </div>
+
+                <button type="button" class="btn btn-primario btn-grande" id="btn-finalizar-pedido">
+                    Finalizar pedido
+                </button>
+            </main>
+        </section>
+
+        <!-- Tela 6 – Área do Cliente -->
+        <section id="tela-cliente" class="tela" aria-labelledby="titulo-cliente" hidden>
+            <header class="header-fixo">
+                <button type="button" class="btn-voltar" id="voltar-cliente" aria-label="Voltar ao catálogo">
+                    ← Voltar
+                </button>
+                <h1 id="titulo-cliente">Área do cliente</h1>
+            </header>
+            <main class="conteudo-central">
+                <div class="card">
+                    <h2>Histórico de pedidos</h2>
+                    <p id="historico-pedidos" class="texto-muted">Você ainda não tem pedidos.</p>
+                </div>
+
+                <div class="card">
+                    <h2>Condições de atacado</h2>
+                    <ul class="lista-condicoes">
+                        <li>Mínimo de <strong>10 unidades</strong> por item para preço atacado.</li>
+                        <li>Acima de 50 unidades: <strong>5% de desconto</strong> adicional.</li>
+                        <li>Acima de 100 unidades: <strong>10% de desconto</strong> adicional.</li>
+                    </ul>
+                </div>
+
+                <a href="#" id="btn-contato-vendedor" class="btn btn-secundario btn-grande">
+                    Falar com o vendedor (WhatsApp)
+                </a>
+            </main>
+        </section>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(function () {});
+        }
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
+
